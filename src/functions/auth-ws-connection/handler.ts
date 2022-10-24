@@ -16,16 +16,12 @@ export const authWsConnection = async (event: APIGatewayRequestAuthorizerEvent, 
         const verifier = CognitoJwtVerifier.create({
             userPoolId: constants.COGNITO_USER_POOL,
             clientId: constants.COGNITO_USER_POOL_CLIENT,
-            tokenUse: "access",
+            tokenUse: "id",
         });
 
         const tokenPayload = await verifier.verify(tokenId);
 
-        // const tokenPayload = await authService.validateTokenId(tokenId, {
-        //     userPoolId: constants.COGNITO_USER_POOL,
-        //     clientId: constants.COGNITO_USER_POOL_CLIENT,
-        // });
-        if (tokenPayload.username === username) {
+        if (tokenPayload["cognito:username"] === username) {
             return context.succeed(generateAllow('me', methodArn));
         }
         await Promise.reject("Wrong username data provided");

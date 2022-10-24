@@ -9,7 +9,7 @@ export const constants = {
     // DYNAMODB_OPTIONS: {},
     // GLUE_JOB_NAME: process.env.GLUE_JOB_NAME,
     // SIGNED_URL_EXPIRE_SECONDS: 60 * 60,
-
+    // KEYS_URL: process.env.KEYS_URL,
 
     ENVIRONMENT: process.env.ENVIRONMENT,
     COGNITO_USER_POOL: process.env.COGNITO_USER_POOL,
@@ -19,6 +19,6 @@ export const constants = {
     STAGE: process.env.STAGE,
     DYNAMODB_TABLE: process.env.DYNAMODB_TABLE,
     DYNAMODB_MEMBER_CHAT_GSI: process.env.DYNAMODB_MEMBER_CHAT_GSI,
-    KEYS_URL: process.env.KEYS_URL,
+    DYNAMODB_CONNECTION_USER_GSI: process.env.DYNAMODB_CONNECTION_USER_GSI,
     WEBSOCKET_API_ENDPOINT: process.env.WEBSOCKET_API_ENDPOINT,
 }

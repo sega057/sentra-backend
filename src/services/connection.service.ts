@@ -11,7 +11,7 @@ class ApiGwService {
         this.connector = new ApiGatewayManagementApi(options);
     }
 
-    async generateSocketMessage(connectionId, data) {
+    async generateSocketMessage(connectionId: string, data: string) {
         try {
             return this.connector.postToConnection({
                 ConnectionId: connectionId,

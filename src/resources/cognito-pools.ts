@@ -1,5 +1,5 @@
 export const cognitoPools = {
-    CognitoUserPool: {
+    ["CognitoUserPool" + "${self:custom.cognito_user_pool_name}"]: {
         Type: "AWS::Cognito::UserPool",
         // DeletionPolicy: "Retain",
         Properties: {
@@ -13,7 +13,7 @@ export const cognitoPools = {
                 DefaultEmailOption: "CONFIRM_WITH_LINK"
             },
             MfaConfiguration: "OFF",
-            UserPoolName: "${self:service}-cognito-${opt:stage, self:provider.stage}",
+            UserPoolName: "${self:custom.cognito_user_pool_name}",
             Policies: {
                 PasswordPolicy: {
                     MinimumLength: 6,
@@ -31,7 +31,7 @@ export const cognitoPools = {
             ClientName: "${self:service}-cognito-client-${opt:stage, self:provider.stage}",
             GenerateSecret: false,
             UserPoolId: {
-                Ref: "CognitoUserPool"
+                Ref: "CognitoUserPoolSentraPool"
             }
         }
     },
@@ -40,7 +40,7 @@ export const cognitoPools = {
         Properties: {
             Domain: "sentra",
             UserPoolId: {
-                Ref: "CognitoUserPool"
+                Ref: "CognitoUserPoolSentraPool"
             },
         },
     },

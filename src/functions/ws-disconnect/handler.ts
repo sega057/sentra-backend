@@ -1,22 +1,23 @@
 import {constants} from "../../constants";
 import {databaseService} from "../../services/database.service";
 import {generateResponse} from "../../models/response.model";
+import {getUserIdByConnectionId} from "@libs/get-user-id-by-connection-id";
 
 const handleSocketDisconnect = async (event, _context) => {
     try {
-        // const connectionId = event.requestContext.connectionId;
-        const username = event.queryStringParameters.Username;
+        const connectionId = event.requestContext.connectionId;
+        const userId = await getUserIdByConnectionId(connectionId);
 
-        const params = {
+        const updateParams = {
             TableName: constants.DYNAMODB_TABLE,
             Key: {
-                PK: `USER#${username}`,
+                PK: `USER#${userId}`,
                 SK: "CONFIG",
             },
             UpdateExpression: "remove connectionId",
         };
 
-        const response = await databaseService.update(params);
+        const response = await databaseService.update(updateParams);
         console.log("remove connectionId", response);
 
         return generateResponse({
@@ -27,7 +28,7 @@ const handleSocketDisconnect = async (event, _context) => {
         console.error('Unable to terminate socket connection', err);
         return generateResponse({
             code: 500,
-            message: 'Unable to terminate socket.',
+            message: 'Unable to terminate socket connection.',
         });
     }
 };

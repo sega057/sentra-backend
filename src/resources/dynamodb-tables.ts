@@ -8,6 +8,7 @@ export const dynamoDbTable = {
                 { AttributeName: "PK", AttributeType: "S" },
                 { AttributeName: "SK", AttributeType: "S" },
                 { AttributeName: "lastReadId", AttributeType: "S" },
+                { AttributeName: "connectionId", AttributeType: "S" },
                 // { AttributeName: "type", AttributeType: "S" },
                 // { AttributeName: "createdAt", AttributeType: "N" },
                 // { AttributeName: "authorId", AttributeType: "S" },
@@ -23,7 +24,6 @@ export const dynamoDbTable = {
                 // { AttributeName: "login", AttributeType: "S" },
                 // { AttributeName: "password", AttributeType: "S" },
                 // { AttributeName: "userInfo", AttributeType: "S" },
-                // { AttributeName: "connectionId", AttributeType: "S" },
             ],
             KeySchema: [
                 { AttributeName: "PK", KeyType: "HASH" },
@@ -44,6 +44,20 @@ export const dynamoDbTable = {
                     Projection: {
                         ProjectionType: "INCLUDE",
                         NonKeyAttributes: [ "PK" ],
+                    },
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: "${self:custom.table_throughput}",
+                        WriteCapacityUnits: "${self:custom.table_throughput}",
+                    },
+                },
+                {
+                    IndexName: "${self:custom.dynamodb_connection_user_gsi}",
+                    KeySchema: [
+                        { AttributeName: "connectionId", KeyType: "HASH" },
+                        { AttributeName: "PK", KeyType: "RANGE" },
+                    ],
+                    Projection: {
+                        ProjectionType: "KEYS_ONLY",
                     },
                     ProvisionedThroughput: {
                         ReadCapacityUnits: "${self:custom.table_throughput}",

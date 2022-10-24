@@ -12,8 +12,10 @@ const serverlessConfiguration: AWS = {
     // When using lambda proxy integration, you have to manually add the CORS headers to responses...
     // https://github.com/serverless/serverless/issues/4681
     corsOrigin: "*",
+    cognito_user_pool_name: "${self:service}-cognito-${opt:stage, self:provider.stage}",
     dynamodb_table: '${self:service}-dynamodb-table-${opt:stage, self:provider.stage}',
     dynamodb_member_chat_gsi: "${self:service}-dynamodb-member-chat-gsi-${opt:stage, self:provider.stage}",
+    dynamodb_connection_user_gsi: "${self:service}-dynamodb_connection_user_gsi-${opt:stage, self:provider.stage}",
     table_throughputs: {
       prod: 1,
       default: 1,
@@ -65,15 +67,18 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       ENVIRONMENT: "${opt:stage, self:provider.stage}",
-      COGNITO_USER_POOL: { Ref: "CognitoUserPool" },
+      COGNITO_USER_POOL: { Ref: "CognitoUserPoolSentraPool" },
       COGNITO_USER_POOL_CLIENT: { Ref: "CognitoUserPoolClient" },
       CORS_ORIGIN: "${self:custom.corsOrigin}",
       REGION: '${self:provider.region}',
       STAGE: '${self:provider.stage}',
       DYNAMODB_TABLE: '${self:custom.dynamodb_table}',
       DYNAMODB_MEMBER_CHAT_GSI: '${self:custom.dynamodb_member_chat_gsi}',
-      KEYS_URL: "!Join ['', ['https://cognito-idp.', '${opt:region, self:provider.region}', '.amazonaws.com/', !Ref CognitoUserPool, '/.well-known/jwks.json']]",
-      WEBSOCKET_API_ENDPOINT: "!Join ['', ['https://', !Ref WebsocketsApi, '.execute-api.', '${opt:region, self:provider.region}', '.amazonaws.com/', '${opt:stage, self:provider.stage}/']]",
+      DYNAMODB_CONNECTION_USER_GSI: '${self:custom.dynamodb_connection_user_gsi}',
+      WEBSOCKET_API_ENDPOINT: {
+        "Fn::Join": ['', ['https://', {Ref:  "WebsocketsApi"}, '.execute-api.', '${opt:region, self:provider.region}', '.amazonaws.com/', '${opt:stage, self:provider.stage}/']],
+      },
+      // KEYS_URL: "!Join ['', ['https://cognito-idp.', '${opt:region, self:provider.region}', '.amazonaws.com/', !Ref CognitoUserPoolSentraPool, '/.well-known/jwks.json']]",
     },
     iam: {
       role: {
@@ -90,7 +95,12 @@ const serverlessConfiguration: AWS = {
               'dynamodb:DeleteItem',
             ],
             Resource: [
-              {"Fn::GetAtt": [ 'DynamoDbTable', 'Arn' ]},
+              {
+                "Fn::GetAtt": [ "DynamoDbTable", "Arn"]
+              },
+              {
+                "Fn::Join": ["/", [{"Fn::GetAtt": ["DynamoDbTable", "Arn"]}, "index/*"]]
+              },
             ],
           },
         ],
@@ -107,7 +117,7 @@ const serverlessConfiguration: AWS = {
     Outputs: {
       CognitoUserPoolId: {
         Value: {
-          Ref: "CognitoUserPool"
+          Ref: "CognitoUserPoolSentraPool"
         },
         Export: {
           Name: "ASW-CognitoUserPoolId-${self:provider.stage}"
