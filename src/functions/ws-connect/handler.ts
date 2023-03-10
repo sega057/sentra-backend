@@ -1,19 +1,25 @@
 import {constants} from "../../constants";
-import {APIGatewayProxyEvent} from "aws-lambda";
+import {APIGatewayProxyHandler} from "aws-lambda";
 import {databaseService} from "../../services/database.service";
 import {generateResponse} from "../../models/response.model";
+import {UserDbFields} from "../../enums/user-db-fields";
 
-const handleSocketConnect = async (event: APIGatewayProxyEvent, _context) => {
+const handleSocketConnect: APIGatewayProxyHandler = async (event) => {
     try {
         const connectionId = event.requestContext.connectionId;
-        const username = event.queryStringParameters.Username;
-        // const connectionType = event.queryStringParameters.connectionType;
+        const username = event.queryStringParameters?.Username;
+        if (!connectionId || !username) {
+            return generateResponse({
+                code: 400,
+                message: 'Bad request',
+            });
+        }
 
         const params = {
             TableName: constants.DYNAMODB_TABLE,
             Key: {
                 PK: `USER#${username}`,
-                SK: "CONFIG",
+                SK: UserDbFields.config,
             },
             UpdateExpression: "set connectionId = :connectionId",
             ExpressionAttributeValues: {
@@ -29,7 +35,7 @@ const handleSocketConnect = async (event: APIGatewayProxyEvent, _context) => {
         });
     } catch (err) {
         console.error('Unable to initialize socket connection', err);
-        generateResponse({
+        return generateResponse({
             code: 500,
             message: 'Unable to register socket.',
         });

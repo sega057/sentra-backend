@@ -1,19 +1,22 @@
 export const cognitoPools = {
-    ["CognitoUserPool" + "${self:custom.cognito_user_pool_name}"]: {
+    CognitoUserPoolSentraPool: {
         Type: "AWS::Cognito::UserPool",
         // DeletionPolicy: "Retain",
         Properties: {
-            AliasAttributes: [
-                "preferred_username"
+            UsernameAttributes: [
+                "email",
             ],
+            // AliasAttributes: [
+            //     "email",
+            // ],
             AutoVerifiedAttributes: [
-                "email"
+                "email",
             ],
             VerificationMessageTemplate: {
                 DefaultEmailOption: "CONFIRM_WITH_LINK"
             },
             MfaConfiguration: "OFF",
-            UserPoolName: "${self:custom.cognito_user_pool_name}",
+            UserPoolName: "${self:service}-cognito-${opt:stage, self:provider.stage}",
             Policies: {
                 PasswordPolicy: {
                     MinimumLength: 6,
@@ -23,7 +26,7 @@ export const cognitoPools = {
                     RequireSymbols: true,
                 },
             },
-        }
+        },
     },
     CognitoUserPoolClient: {
         Type: "AWS::Cognito::UserPoolClient",

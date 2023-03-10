@@ -15,7 +15,7 @@ export interface IResponse {
 
 const RESPONSE_HEADERS: ResponseHeader = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': constants.CORS_ORIGIN, // Required for CORS support to work
+    'Access-Control-Allow-Origin': constants.CORS_ORIGIN ?? "", // Required for CORS support to work
     'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
 };
 
@@ -34,7 +34,7 @@ export interface ResponseConfig {
 
 export function generateResponse({
     code,
-    message,
+    message = "",
     data,
     headers = {},
 }: ResponseConfig): IResponse {

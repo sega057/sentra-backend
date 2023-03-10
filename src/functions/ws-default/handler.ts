@@ -3,21 +3,30 @@ import {constants} from "../../constants";
 import {getUserIdByConnectionId} from "@libs/get-user-id-by-connection-id";
 import {connectionService} from "../../services/connection.service";
 import {generateResponse} from "../../models/response.model";
+import {APIGatewayProxyHandler} from "aws-lambda";
 
-const handleSocketDefault = async (event, _context) => {
+const handleSocketDefault: APIGatewayProxyHandler = async (event) => {
     try {
         const connectionId = event.requestContext.connectionId;
+        if (!connectionId) {
+            return generateResponse({
+                code: 400,
+                message: 'Bad request',
+            });
+        }
         const userId = await getUserIdByConnectionId(connectionId);
+
         console.log("socket api url: ", constants.WEBSOCKET_API_ENDPOINT);
 
         // const data = JSON.parse(event.body);
         // const action = data.action;
 
-        const apigwResponse = await connectionService.generateSocketMessage(
+        const apiGwResponse = await connectionService.generateSocketMessage(
             connectionId,
             `Hello, ${userId}, ${event.body}`,
+            userId
         );
-        console.log("apigwResponse", apigwResponse);
+        console.log("apiGwResponse", apiGwResponse);
         // switch (action) {
         //     case 'PING':
         //         const pingResponse = JSON.stringify({action: 'PING', value: 'PONG'});
@@ -36,7 +45,7 @@ const handleSocketDefault = async (event, _context) => {
         console.error('Unable to generate default response', err);
         return generateResponse({
             code: 500,
-            message: "Default socket response error.",
+            message: 'Unable to generate default response',
         });
     }
 };

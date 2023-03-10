@@ -2,17 +2,25 @@ import {constants} from "../../constants";
 import {databaseService} from "../../services/database.service";
 import {generateResponse} from "../../models/response.model";
 import {getUserIdByConnectionId} from "@libs/get-user-id-by-connection-id";
+import {UserDbFields} from "../../enums/user-db-fields";
+import {APIGatewayProxyHandler} from "aws-lambda";
 
-const handleSocketDisconnect = async (event, _context) => {
+const handleSocketDisconnect: APIGatewayProxyHandler = async (event) => {
     try {
         const connectionId = event.requestContext.connectionId;
+        if (!connectionId) {
+            return generateResponse({
+                code: 400,
+                message: 'Bad request',
+            });
+        }
         const userId = await getUserIdByConnectionId(connectionId);
 
         const updateParams = {
             TableName: constants.DYNAMODB_TABLE,
             Key: {
                 PK: `USER#${userId}`,
-                SK: "CONFIG",
+                SK: UserDbFields.config,
             },
             UpdateExpression: "remove connectionId",
         };

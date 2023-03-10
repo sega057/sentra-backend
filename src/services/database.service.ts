@@ -11,28 +11,28 @@ import {constants} from "../constants";
 // }
 
 // Put
-type PutItem = AWS.DynamoDB.DocumentClient.PutItemInput;
-type PutItemOutput = AWS.DynamoDB.DocumentClient.PutItemOutput;
+export type PutItem = AWS.DynamoDB.DocumentClient.PutItemInput;
+export type PutItemOutput = AWS.DynamoDB.DocumentClient.PutItemOutput;
 
 // Batch write
-type BatchWrite = AWS.DynamoDB.DocumentClient.BatchWriteItemInput;
-type BatchWriteOutPut = AWS.DynamoDB.DocumentClient.BatchWriteItemOutput;
+export type BatchWrite = AWS.DynamoDB.DocumentClient.BatchWriteItemInput;
+export type BatchWriteOutPut = AWS.DynamoDB.DocumentClient.BatchWriteItemOutput;
 
 // Update
-type UpdateItem = AWS.DynamoDB.DocumentClient.UpdateItemInput;
-type UpdateItemOutPut = AWS.DynamoDB.DocumentClient.UpdateItemOutput;
+export type UpdateItem = AWS.DynamoDB.DocumentClient.UpdateItemInput;
+export type UpdateItemOutPut = AWS.DynamoDB.DocumentClient.UpdateItemOutput;
 
 // Query
-type QueryItem = AWS.DynamoDB.DocumentClient.QueryInput;
-type QueryItemOutput = AWS.DynamoDB.DocumentClient.QueryOutput;
+export type QueryItem = AWS.DynamoDB.DocumentClient.QueryInput;
+export type QueryItemOutput = AWS.DynamoDB.DocumentClient.QueryOutput;
 
 // Get
-type GetItem = AWS.DynamoDB.DocumentClient.GetItemInput;
-type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
+export type GetItem = AWS.DynamoDB.DocumentClient.GetItemInput;
+export type GetItemOutput = AWS.DynamoDB.DocumentClient.GetItemOutput;
 
 // Delete
-type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
-type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
+export type DeleteItem = AWS.DynamoDB.DocumentClient.DeleteItemInput;
+export type DeleteItemOutput = AWS.DynamoDB.DocumentClient.DeleteItemOutput;
 
 type Item = {[index: string]: string};
 
@@ -55,7 +55,7 @@ class DatabaseService {
     }
 
     getItem = async ({ key, hash, hashValue, tableName}: Item) => {
-        const params = {
+        const params: GetItem = {
             TableName: tableName,
             Key: {
                 id: key,

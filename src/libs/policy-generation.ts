@@ -1,26 +1,32 @@
-const generatePolicy = function (principalId, effect, resource) {
-    const authResponse: Record<string, any> = {};
-    authResponse.principalId = principalId;
+import { APIGatewayAuthorizerResult, Statement } from "aws-lambda";
+
+const generatePolicy = function (principalId: string, effect: string, resource: string): APIGatewayAuthorizerResult {
+    const authResponse: APIGatewayAuthorizerResult = {
+        principalId,
+        policyDocument: {
+            // default version
+            Version: "2012-10-17",
+            Statement: [],
+        }
+    };
+
     if (effect && resource) {
-        const policyDocument: Record<string, any> = {};
-        // default version
-        policyDocument.Version = "2012-10-17";
-        policyDocument.Statement = [];
-        const statementOne: Record<string, any> = {};
-        // default action
-        statementOne.Action = "execute-api:Invoke";
-        statementOne.Effect = effect;
-        statementOne.Resource = resource;
-        policyDocument.Statement[0] = statementOne;
-        authResponse.policyDocument = policyDocument;
+        const statementOne: Statement = {
+            // default action
+            Action: "execute-api:Invoke",
+            Effect: effect,
+            Resource: resource,
+        };
+        authResponse.policyDocument.Statement.push(statementOne);
     }
+
     return authResponse;
 };
 
-export const generateAllow = function (principalId, resource) {
+export const generateAllow = function (principalId: string, resource: string): APIGatewayAuthorizerResult {
     return generatePolicy(principalId, "Allow", resource);
 };
 
-export const generateDeny = function (principalId, resource) {
+export const generateDeny = function (principalId: string, resource: string): APIGatewayAuthorizerResult {
     return generatePolicy(principalId, "Deny", resource);
 };
